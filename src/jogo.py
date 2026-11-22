@@ -229,6 +229,20 @@ def desenhar_hud(tela, estado, fontes):
     tela.blit(hud_renderizado, (10, 10))
 
 
+def desenhar_tela_fim(tela, estado, fontes):
+    """Desenha a tela de fim de jogo com a pontuação final e as instruções."""
+    mensagem = fontes["fim"].render("O feed foi invadido por fakes!", True, COR_SELO)
+    tela.blit(mensagem, mensagem.get_rect(center=(LARGURA_TELA // 2, ALTURA_TELA // 2 - 50)))
+
+    placar = fontes["hud"].render(
+        f"Pontuacao final: {estado['pontos']}   Recorde: {estado['recorde']}", True, VERDE
+    )
+    tela.blit(placar, placar.get_rect(center=(LARGURA_TELA // 2, ALTURA_TELA // 2)))
+
+    instrucao = fontes["hud"].render("R para jogar de novo, Esc para sair", True, VERDE)
+    tela.blit(instrucao, instrucao.get_rect(center=(LARGURA_TELA // 2, ALTURA_TELA // 2 + 40)))
+
+
 def desenhar(tela, estado, fontes):
     """Desenha toda a cena do jogo na tela."""
     tela.fill(FUNDO_ESCURO)
@@ -238,6 +252,8 @@ def desenhar(tela, estado, fontes):
     for selo in estado["selos"]:
         pygame.draw.rect(tela, COR_SELO, selo)
     desenhar_hud(tela, estado, fontes)
+    if estado["estado"] == "fim":
+        desenhar_tela_fim(tela, estado, fontes)
     pygame.display.flip()
 
 
@@ -252,6 +268,7 @@ def executar_jogo():
         "post": pygame.font.SysFont("couriernew", 14),
         "pista": pygame.font.SysFont("couriernew", 14, italic=True),
         "hud": pygame.font.SysFont("couriernew", 18),
+        "fim": pygame.font.SysFont("couriernew", 26, bold=True),
     }
 
     estado = criar_estado()
