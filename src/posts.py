@@ -62,3 +62,61 @@ POSTS_BASE = [
     {"texto": "Vídeo: diretor anuncia fim das provas",
      "fake": True, "pista": "boca fora de sincronia"},
 ]
+
+
+def criar_post(largura_tela):
+    """Sorteia um post de POSTS_BASE e devolve uma cópia pronta para cair."""
+    base = random.choice(POSTS_BASE)
+
+    # dict(base) é uma cópia: os valores são str e bool (imutáveis), então
+    # mexer no post que cai nunca altera o POSTS_BASE.
+    post = dict(base)
+
+    # O post nasce logo acima da tela (y negativo) e cai a partir dali.
+    # O x sorteado garante que o cartão inteiro fique dentro da largura.
+    x_maximo = max(0, largura_tela - LARGURA_POST)
+    x = random.randint(0, x_maximo)
+    post["rect"] = pygame.Rect(x, -ALTURA_POST, LARGURA_POST, ALTURA_POST)
+    return post
+
+
+def mover_posts(posts, velocidade):
+    """Desce todos os posts da lista, somando a velocidade ao rect.y.
+
+    Use velocidade inteira (pixels por quadro): o pygame.Rect guarda
+    coordenadas inteiras e descartaria a parte decimal.
+    """
+    for post in posts:
+        post["rect"].y += velocidade
+
+
+def separar_posts_no_chao(posts, altura_tela):
+    """Separa os posts que chegaram ao chão dos que ainda estão caindo.
+
+    Devolve (restantes, no_chao), duas listas novas. Um post está no chão
+    quando o topo do cartão alcança a altura da tela (rect.top >= altura).
+    """
+    restantes = []
+    no_chao = []
+    for post in posts:
+        if post["rect"].top >= altura_tela:
+            no_chao.append(post)
+        else:
+            restantes.append(post)
+    return restantes, no_chao
+
+
+def carregar_posts(caminho):
+    """Lê os posts de um arquivo de texto; sem arquivo, usa POSTS_BASE.
+
+    Formato: uma linha por post, "texto;fake;pista", com fake escrito como
+    "true" ou "false". Linhas em branco, começando com "#" ou mal formadas
+    são ignoradas. Se o arquivo não existir ou não tiver nenhum post
+    válido, devolve POSTS_BASE.
+    """
+    try:
+        with open(caminho, encoding="utf-8") as arquivo:
+            linhas = arquivo.read().splitlines()
+    except FileNotFoundError:
+        
+        return POSTS_BASE
