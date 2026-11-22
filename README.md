@@ -49,24 +49,16 @@ Exemplo:
 
 ## Controles
 
-Informe as teclas ou comandos utilizados no jogo.
-
-Exemplo:
-
-- Seta para cima: mover para cima
-- Seta para baixo: mover para baixo
-- Seta para esquerda: mover para esquerda
-- Seta para direita: mover para direita
-- Espaço: realizar ação
-- ESC: sair do jogo
+- Seta para a esquerda ou **A**: mover o Lupa-bot para a esquerda
+- Seta para a direita ou **D**: mover o Lupa-bot para a direita
+- **Espaço**: disparar o Selo FAKE
+- **Shift** (esquerdo ou direito, segurado): ativar a Lupa e revelar as pistas dos posts
+- **R**: jogar de novo, na tela de fim de jogo
+- **Esc**: sair do jogo em qualquer momento
 
 ## Como executar o projeto
 
-### 1. Clonar o repositório
-
 ```bash
-git clone LINK_DO_REPOSITORIO
-cd NOME_DA_PASTA
 pip install -r requirements.txt
 python main.py
 ```
