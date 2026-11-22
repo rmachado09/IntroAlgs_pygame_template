@@ -10,6 +10,7 @@ from src.config import (
     COR_POST,
     COR_BORDA_POST,
     COR_SELO,
+    VERDE,
     VIDAS_INICIAIS,
     LARGURA_JOGADOR,
     ALTURA_JOGADOR,
@@ -24,7 +25,7 @@ from src.config import (
 )
 from src.dados import salvar_recorde, carregar_recorde
 from src.funcoes import calcular_pontos, tomar_dano, jogador_perdeu, limitar_valor, verificar_colisao
-from src.logica_jogo import mover_jogador
+from src.logica_jogo import mover_jogador, quebrar_texto
 from src.temp_integracao import (
     criar_post,
     mover_posts,
@@ -98,6 +99,12 @@ def atualizar_posts(estado):
     estado["posts"] = restantes
     for post in no_chao:
         aplicar_acao(estado, "chao", post["fake"])
+
+
+def atualizar_lupa(estado):
+    """Ativa a Lupa enquanto Shift (esquerdo ou direito) estiver pressionado."""
+    teclas = pygame.key.get_pressed()
+    estado["lupa_ativa"] = bool(teclas[pygame.K_LSHIFT] or teclas[pygame.K_RSHIFT])
 
 
 def atualizar_disparo(estado):
@@ -177,6 +184,7 @@ def atualizar(estado):
     if estado["estado"] != "jogando":
         return
     atualizar_jogador(estado)
+    atualizar_lupa(estado)
     atualizar_posts(estado)
     atualizar_disparo(estado)
     atualizar_selos(estado)
@@ -193,10 +201,20 @@ def atualizar_titulo_janela(estado):
     )
 
 
-def desenhar_post(tela, post):
-    """Desenha o cartão de um post como um retângulo simples."""
+def desenhar_post(tela, post, fontes, lupa_ativa):
+    """Desenha o cartão de um post e, com a Lupa ativa, a pista acima dele."""
     pygame.draw.rect(tela, COR_POST, post["rect"])
     pygame.draw.rect(tela, COR_BORDA_POST, post["rect"], 2)
+
+    linhas = quebrar_texto(post["texto"], 28)
+    for indice, linha in enumerate(linhas[:3]):
+        texto_renderizado = fontes["post"].render(linha, True, VERDE)
+        tela.blit(texto_renderizado, (post["rect"].x + 6, post["rect"].y + 6 + indice * 16))
+
+    if lupa_ativa:
+        cor_pista = COR_SELO if post["fake"] else VERDE
+        pista_renderizada = fontes["pista"].render(post["pista"], True, cor_pista)
+        tela.blit(pista_renderizada, (post["rect"].x, post["rect"].y - 18))
 
 
 def desenhar(tela, estado, fontes):
@@ -204,7 +222,7 @@ def desenhar(tela, estado, fontes):
     tela.fill(FUNDO_ESCURO)
     pygame.draw.rect(tela, COR_JOGADOR, estado["jogador"]["rect"])
     for post in estado["posts"]:
-        desenhar_post(tela, post)
+        desenhar_post(tela, post, fontes, estado["lupa_ativa"])
     for selo in estado["selos"]:
         pygame.draw.rect(tela, COR_SELO, selo)
     pygame.display.flip()
@@ -217,7 +235,10 @@ def executar_jogo():
     pygame.display.set_caption(TITULO_JOGO)
     relogio = pygame.time.Clock()
 
-    fontes = {}
+    fontes = {
+        "post": pygame.font.SysFont("couriernew", 14),
+        "pista": pygame.font.SysFont("couriernew", 14, italic=True),
+    }
 
     estado = criar_estado()
     rodando = True
