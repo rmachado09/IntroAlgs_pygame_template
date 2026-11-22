@@ -7,14 +7,19 @@ from src.config import (
     TITULO_JOGO,
     FUNDO_ESCURO,
     COR_JOGADOR,
+    COR_POST,
+    COR_BORDA_POST,
     VIDAS_INICIAIS,
     LARGURA_JOGADOR,
     ALTURA_JOGADOR,
     VELOCIDADE_JOGADOR,
+    VELOCIDADE_POSTS,
+    INTERVALO_NOVO_POST,
     CAMINHO_RECORDE,
 )
 from src.dados import salvar_recorde, carregar_recorde
 from src.logica_jogo import mover_jogador
+from src.temp_integracao import criar_post, mover_posts, separar_posts_no_chao
 
 
 def criar_estado():
@@ -66,11 +71,27 @@ def atualizar_jogador(estado):
     rect.x = mover_jogador(rect.x, direcao, VELOCIDADE_JOGADOR, LARGURA_TELA, rect.width)
 
 
+def atualizar_posts(estado):
+    """Cria novos posts periodicamente, desce os existentes e remove os que chegam ao chão."""
+    agora = pygame.time.get_ticks()
+    if agora - estado["tempo_ultimo_post"] >= INTERVALO_NOVO_POST:
+        estado["posts"].append(criar_post(LARGURA_TELA))
+        estado["tempo_ultimo_post"] = agora
+
+    mover_posts(estado["posts"], VELOCIDADE_POSTS)
+
+    restantes, no_chao = separar_posts_no_chao(estado["posts"], ALTURA_TELA)
+    estado["posts"] = restantes
+    for post in no_chao:
+        pass  # TODO: aplicar a acao "chao" quando a pontuacao for integrada
+
+
 def atualizar(estado):
     """Atualiza a lógica do jogo quando a partida está em andamento."""
     if estado["estado"] != "jogando":
         return
     atualizar_jogador(estado)
+    atualizar_posts(estado)
 
 
 def atualizar_titulo_janela(estado):
@@ -81,10 +102,18 @@ def atualizar_titulo_janela(estado):
     )
 
 
+def desenhar_post(tela, post):
+    """Desenha o cartão de um post como um retângulo simples."""
+    pygame.draw.rect(tela, COR_POST, post["rect"])
+    pygame.draw.rect(tela, COR_BORDA_POST, post["rect"], 2)
+
+
 def desenhar(tela, estado, fontes):
     """Desenha toda a cena do jogo na tela."""
     tela.fill(FUNDO_ESCURO)
     pygame.draw.rect(tela, COR_JOGADOR, estado["jogador"]["rect"])
+    for post in estado["posts"]:
+        desenhar_post(tela, post)
     pygame.display.flip()
 
 
