@@ -9,12 +9,17 @@ from src.config import (
     COR_JOGADOR,
     COR_POST,
     COR_BORDA_POST,
+    COR_SELO,
     VIDAS_INICIAIS,
     LARGURA_JOGADOR,
     ALTURA_JOGADOR,
+    LARGURA_SELO,
+    ALTURA_SELO,
     VELOCIDADE_JOGADOR,
     VELOCIDADE_POSTS,
+    VELOCIDADE_SELO,
     INTERVALO_NOVO_POST,
+    INTERVALO_DISPARO,
     CAMINHO_RECORDE,
 )
 from src.dados import salvar_recorde, carregar_recorde
@@ -40,7 +45,7 @@ def criar_estado():
         "estado": "jogando",
         "lupa_ativa": False,
         "tempo_ultimo_post": pygame.time.get_ticks(),
-        "tempo_ultimo_disparo": 0,
+        "tempo_ultimo_disparo": -INTERVALO_DISPARO,
     }
 
 
@@ -86,12 +91,37 @@ def atualizar_posts(estado):
         pass  # TODO: aplicar a acao "chao" quando a pontuacao for integrada
 
 
+def atualizar_disparo(estado):
+    """Dispara um Selo FAKE com Espaço, respeitando o intervalo mínimo entre tiros."""
+    teclas = pygame.key.get_pressed()
+    agora = pygame.time.get_ticks()
+    if teclas[pygame.K_SPACE] and agora - estado["tempo_ultimo_disparo"] >= INTERVALO_DISPARO:
+        jogador_rect = estado["jogador"]["rect"]
+        selo = pygame.Rect(
+            jogador_rect.centerx - LARGURA_SELO // 2,
+            jogador_rect.top - ALTURA_SELO,
+            LARGURA_SELO,
+            ALTURA_SELO,
+        )
+        estado["selos"].append(selo)
+        estado["tempo_ultimo_disparo"] = agora
+
+
+def atualizar_selos(estado):
+    """Sobe os selos disparados e remove os que saem pelo topo da tela."""
+    for selo in estado["selos"]:
+        selo.y -= VELOCIDADE_SELO
+    estado["selos"] = [selo for selo in estado["selos"] if selo.bottom > 0]
+
+
 def atualizar(estado):
     """Atualiza a lógica do jogo quando a partida está em andamento."""
     if estado["estado"] != "jogando":
         return
     atualizar_jogador(estado)
     atualizar_posts(estado)
+    atualizar_disparo(estado)
+    atualizar_selos(estado)
 
 
 def atualizar_titulo_janela(estado):
@@ -114,6 +144,8 @@ def desenhar(tela, estado, fontes):
     pygame.draw.rect(tela, COR_JOGADOR, estado["jogador"]["rect"])
     for post in estado["posts"]:
         desenhar_post(tela, post)
+    for selo in estado["selos"]:
+        pygame.draw.rect(tela, COR_SELO, selo)
     pygame.display.flip()
 
 
