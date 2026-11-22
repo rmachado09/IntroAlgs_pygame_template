@@ -1,15 +1,13 @@
-# Nome do Jogo
+# Fato ou Fake?
 
 Projeto final da disciplina de Introdução a Algoritmos/Programação, desenvolvido com Python e Pygame.
 
-Este repositório é um template para os grupos da disciplina. A proposta é começar com uma base funcional e evoluir o jogo ao longo do semestre.
-
 ## Integrantes do grupo
 
-- Nome do integrante 1
-- Nome do integrante 2
-- Nome do integrante 3
-- Nome do integrante 4
+- Anna Luisa Alexandre Rodrigues
+- Filipe Santana Linhares Frota da Mota
+- Raissa Marcele Oliveira Machado
+- Sebastian Augusto Lopes Camargo
 
 ## Estrutura do projeto
 
@@ -22,51 +20,32 @@ Este repositório é um template para os grupos da disciplina. A proposta é com
 
 ## Descrição do jogo
 
-Descreva brevemente a ideia principal do jogo.
-
-Exemplo:
-
-> O jogo consiste em controlar um personagem que deve coletar moedas e evitar obstáculos. O jogador ganha pontos ao coletar itens e perde vidas ao colidir com obstáculos. A partida termina quando o tempo acaba ou quando o jogador perde todas as vidas.
+Em um visual retrô de terminal, posts de rede social (notícia, foto, mensagem) caem do topo da tela. O jogador controla o Lupa-bot, um robô que anda para os lados na parte de baixo da tela, e decide o que fazer com cada post: coletar os reais e eliminar os falsos com o Selo FAKE. Segurando Shift, o jogador ativa a Lupa e vê a pista de cada post (ex.: "sem fonte", "urgência exagerada"), que é o único jeito de diferenciar real de falso.
 
 ## Objetivo do jogador
 
-Explique o que o jogador precisa fazer para vencer ou avançar no jogo.
-
-Exemplo:
-
-> O objetivo é coletar a maior quantidade possível de itens antes que o tempo acabe, evitando colisões com os obstáculos.
+Fazer a maior pontuação possível, coletando posts reais e eliminando posts falsos com o Selo FAKE, enquanto mantém as 3 vidas e evita que posts falsos cheguem ao chão ou sejam coletados por engano.
 
 ## Regras do jogo
 
-Liste as principais regras do jogo.
-
-Exemplo:
-
-- O jogador se movimenta usando as setas do teclado.
-- Cada item coletado aumenta a pontuação.
-- Colidir com um obstáculo reduz a quantidade de vidas.
-- A partida termina quando o jogador perde todas as vidas ou quando o tempo acaba.
+- Encostar num post real com o robô coleta: +10 pontos.
+- Atirar o Selo FAKE (Espaço) num post falso elimina: +15 pontos.
+- Atirar o Selo FAKE num post real é uma acusação injusta: -10 pontos.
+- Coletar um post falso, ou deixar um post falso chegar ao chão, custa 1 vida; post real no chão não tem penalidade.
+- O jogador começa com 3 vidas; ao chegar a 0, a partida termina e o recorde é salvo se for batido.
 
 ## Controles
 
-Informe as teclas ou comandos utilizados no jogo.
-
-Exemplo:
-
-- Seta para cima: mover para cima
-- Seta para baixo: mover para baixo
-- Seta para esquerda: mover para esquerda
-- Seta para direita: mover para direita
-- Espaço: realizar ação
-- ESC: sair do jogo
+- Seta para a esquerda ou **A**: mover o Lupa-bot para a esquerda
+- Seta para a direita ou **D**: mover o Lupa-bot para a direita
+- **Espaço**: disparar o Selo FAKE
+- **Shift** (esquerdo ou direito, segurado): ativar a Lupa e revelar as pistas dos posts
+- **R**: jogar de novo, na tela de fim de jogo
+- **Esc**: sair do jogo em qualquer momento
 
 ## Como executar o projeto
 
-### 1. Clonar o repositório
-
 ```bash
-git clone LINK_DO_REPOSITORIO
-cd NOME_DA_PASTA
 pip install -r requirements.txt
 python main.py
 ```
