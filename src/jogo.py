@@ -23,8 +23,17 @@ from src.config import (
     CAMINHO_RECORDE,
 )
 from src.dados import salvar_recorde, carregar_recorde
+from src.funcoes import calcular_pontos, tomar_dano, jogador_perdeu, limitar_valor, verificar_colisao
 from src.logica_jogo import mover_jogador
-from src.temp_integracao import criar_post, mover_posts, separar_posts_no_chao
+from src.temp_integracao import (
+    criar_post,
+    mover_posts,
+    separar_posts_no_chao,
+    pontos_por_acao,
+    perde_vida,
+)
+
+PONTUACAO_MAXIMA = 10**9
 
 
 def criar_estado():
@@ -88,7 +97,7 @@ def atualizar_posts(estado):
     restantes, no_chao = separar_posts_no_chao(estado["posts"], ALTURA_TELA)
     estado["posts"] = restantes
     for post in no_chao:
-        pass  # TODO: aplicar a acao "chao" quando a pontuacao for integrada
+        aplicar_acao(estado, "chao", post["fake"])
 
 
 def atualizar_disparo(estado):
@@ -114,6 +123,55 @@ def atualizar_selos(estado):
     estado["selos"] = [selo for selo in estado["selos"] if selo.bottom > 0]
 
 
+def aplicar_acao(estado, acao, eh_fake):
+    """Aplica a pontuação e, se for o caso, a perda de vida de uma ação sobre um post."""
+    pontos_ganhos = pontos_por_acao(acao, eh_fake)
+    novos_pontos = calcular_pontos(estado["pontos"], pontos_ganhos)
+    estado["pontos"] = limitar_valor(novos_pontos, 0, PONTUACAO_MAXIMA)
+
+    if perde_vida(acao, eh_fake):
+        estado["vidas"] = tomar_dano(estado["vidas"], 1)
+
+
+def tratar_coleta(estado):
+    """Remove posts tocados pelo jogador e aplica a ação de coleta."""
+    jogador_rect = estado["jogador"]["rect"]
+    posts_restantes = []
+    for post in estado["posts"]:
+        if verificar_colisao(jogador_rect, post["rect"]):
+            aplicar_acao(estado, "coletar", post["fake"])
+        else:
+            posts_restantes.append(post)
+    estado["posts"] = posts_restantes
+
+
+def tratar_disparos(estado):
+    """Remove o post e o selo que colidirem e aplica a ação de disparo."""
+    selos_restantes = []
+    for selo in estado["selos"]:
+        post_atingido = None
+        for post in estado["posts"]:
+            if verificar_colisao(selo, post["rect"]):
+                post_atingido = post
+                break
+
+        if post_atingido is None:
+            selos_restantes.append(selo)
+        else:
+            aplicar_acao(estado, "atirar", post_atingido["fake"])
+            estado["posts"].remove(post_atingido)
+    estado["selos"] = selos_restantes
+
+
+def verificar_fim_de_jogo(estado):
+    """Encerra a partida e salva o recorde quando o jogador fica sem vidas."""
+    if estado["estado"] == "jogando" and jogador_perdeu(estado["vidas"]):
+        estado["estado"] = "fim"
+        if estado["pontos"] > estado["recorde"]:
+            estado["recorde"] = estado["pontos"]
+            salvar_recorde(CAMINHO_RECORDE, estado["recorde"])
+
+
 def atualizar(estado):
     """Atualiza a lógica do jogo quando a partida está em andamento."""
     if estado["estado"] != "jogando":
@@ -122,6 +180,9 @@ def atualizar(estado):
     atualizar_posts(estado)
     atualizar_disparo(estado)
     atualizar_selos(estado)
+    tratar_coleta(estado)
+    tratar_disparos(estado)
+    verificar_fim_de_jogo(estado)
 
 
 def atualizar_titulo_janela(estado):
