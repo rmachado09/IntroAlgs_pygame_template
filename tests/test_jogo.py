@@ -1,5 +1,6 @@
 from src.logica_jogo import mover_jogador, quebrar_texto
-from src.temp_integracao import pontos_por_acao, perde_vida, separar_posts_no_chao
+from src.funcoes import pontos_por_acao, perde_vida
+from src.posts import separar_posts_no_chao
 
 
 def test_mover_jogador_dentro_dos_limites():

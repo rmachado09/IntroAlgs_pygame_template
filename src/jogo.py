@@ -24,15 +24,17 @@ from src.config import (
     CAMINHO_RECORDE,
 )
 from src.dados import salvar_recorde, carregar_recorde
-from src.funcoes import calcular_pontos, tomar_dano, jogador_perdeu, limitar_valor, verificar_colisao
-from src.logica_jogo import mover_jogador, quebrar_texto
-from src.temp_integracao import (
-    criar_post,
-    mover_posts,
-    separar_posts_no_chao,
+from src.funcoes import (
+    calcular_pontos,
+    tomar_dano,
+    jogador_perdeu,
+    limitar_valor,
+    verificar_colisao,
     pontos_por_acao,
     perde_vida,
 )
+from src.logica_jogo import mover_jogador, quebrar_texto
+from src.posts import criar_post, mover_posts, separar_posts_no_chao
 
 PONTUACAO_MAXIMA = 10**9
 
