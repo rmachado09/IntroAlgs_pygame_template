@@ -1,6 +1,6 @@
 import random
 
-import jogo
+import pygame
 
 
 # Tamanho do cartão de cada post, em pixels.
