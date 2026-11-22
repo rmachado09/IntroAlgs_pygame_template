@@ -118,5 +118,18 @@ def carregar_posts(caminho):
         with open(caminho, encoding="utf-8") as arquivo:
             linhas = arquivo.read().splitlines()
     except FileNotFoundError:
-        
         return POSTS_BASE
+
+    posts = []
+    for linha in linhas:
+        linha = linha.strip()
+        if not linha or linha.startswith("#"):
+            continue
+        partes = [parte.strip() for parte in linha.split(";")]
+        if len(partes) != 3 or partes[1].lower() not in ("true", "false"):
+            continue
+        texto, fake, pista = partes
+        posts.append({"texto": texto, "fake": fake.lower() == "true",
+                      "pista": pista})
+
+    return posts if posts else POSTS_BASE
