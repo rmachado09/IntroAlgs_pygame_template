@@ -6,12 +6,15 @@ from src.config import (
     FPS,
     TITULO_JOGO,
     FUNDO_ESCURO,
+    COR_JOGADOR,
     VIDAS_INICIAIS,
     LARGURA_JOGADOR,
     ALTURA_JOGADOR,
+    VELOCIDADE_JOGADOR,
     CAMINHO_RECORDE,
 )
 from src.dados import salvar_recorde, carregar_recorde
+from src.logica_jogo import mover_jogador
 
 
 def criar_estado():
@@ -50,10 +53,24 @@ def tratar_eventos(estado):
     return True
 
 
+def atualizar_jogador(estado):
+    """Move o Lupa-bot para os lados conforme as teclas pressionadas."""
+    teclas = pygame.key.get_pressed()
+    direcao = 0
+    if teclas[pygame.K_LEFT] or teclas[pygame.K_a]:
+        direcao -= 1
+    if teclas[pygame.K_RIGHT] or teclas[pygame.K_d]:
+        direcao += 1
+
+    rect = estado["jogador"]["rect"]
+    rect.x = mover_jogador(rect.x, direcao, VELOCIDADE_JOGADOR, LARGURA_TELA, rect.width)
+
+
 def atualizar(estado):
     """Atualiza a lógica do jogo quando a partida está em andamento."""
     if estado["estado"] != "jogando":
         return
+    atualizar_jogador(estado)
 
 
 def atualizar_titulo_janela(estado):
@@ -67,6 +84,7 @@ def atualizar_titulo_janela(estado):
 def desenhar(tela, estado, fontes):
     """Desenha toda a cena do jogo na tela."""
     tela.fill(FUNDO_ESCURO)
+    pygame.draw.rect(tela, COR_JOGADOR, estado["jogador"]["rect"])
     pygame.display.flip()
 
 
