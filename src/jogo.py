@@ -217,6 +217,18 @@ def desenhar_post(tela, post, fontes, lupa_ativa):
         tela.blit(pista_renderizada, (post["rect"].x, post["rect"].y - 18))
 
 
+def desenhar_hud(tela, estado, fontes):
+    """Desenha pontos, vidas, recorde e o indicador da Lupa no topo da tela."""
+    texto_hud = (
+        f"Pontos: {estado['pontos']}  Vidas: {estado['vidas']}  Recorde: {estado['recorde']}"
+    )
+    if estado["lupa_ativa"]:
+        texto_hud += "  LUPA ATIVA"
+
+    hud_renderizado = fontes["hud"].render(texto_hud, True, VERDE)
+    tela.blit(hud_renderizado, (10, 10))
+
+
 def desenhar(tela, estado, fontes):
     """Desenha toda a cena do jogo na tela."""
     tela.fill(FUNDO_ESCURO)
@@ -225,6 +237,7 @@ def desenhar(tela, estado, fontes):
         desenhar_post(tela, post, fontes, estado["lupa_ativa"])
     for selo in estado["selos"]:
         pygame.draw.rect(tela, COR_SELO, selo)
+    desenhar_hud(tela, estado, fontes)
     pygame.display.flip()
 
 
@@ -238,6 +251,7 @@ def executar_jogo():
     fontes = {
         "post": pygame.font.SysFont("couriernew", 14),
         "pista": pygame.font.SysFont("couriernew", 14, italic=True),
+        "hud": pygame.font.SysFont("couriernew", 18),
     }
 
     estado = criar_estado()
